@@ -40,3 +40,25 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+
+/* scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  /* display: none; */
+  height: 4px;
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #e5e3e6;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #be93e6;
+  border-radius: 8px;
+  width: 2px;
+  cursor: pointer;
+}

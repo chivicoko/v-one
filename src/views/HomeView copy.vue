@@ -4,25 +4,49 @@ import FooterView from '@/components/FooterView.vue';
 import LoadingView from '@/components/LoadingView.vue';
 import NavbarView from '@/components/NavbarView.vue';
 import MobileNavView from '@/components/MobileNavView.vue';
-import ProductListView from '@/components/ProductListView.vue';
-import ProductGridView from '@/components/ProductGridView.vue';
+import { products } from '@/utils/data';
+import axios from 'axios';
+import { RouterLink } from 'vue-router';
 import { ref } from 'vue';
-
-import {mapGetters, mapActions} from 'vuex';
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'HomeView',
-  components: { LoadingView, NavbarView, MobileNavView, FooterView, ProductListView, ProductGridView, },
-  data() {
-    return {
-      productView: 'grid',
+  components: { LoadingView, NavbarView, MobileNavView, FooterView, RouterLink, },
+  data: function() {
+  return {
+      products,
+      products2: {},
+      loading: false,
+      error: null,
     };
   },
   methods: {
-    ...mapActions('products', ['getAllProducts']),
-    toggleProductView() {
-      this.productView = this.productView === 'grid'? 'list' : 'grid';
+    async getProducts() {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products`);
+
+        // Check for successful response and valid data format
+        if (res.status === 200 && Array.isArray(res.data)) {
+          this.products2 = res.data;
+          // console.log(this.products2);
+        } else {
+          throw new Error('Unexpected response format');
+        }
+      } catch (error) {
+        this.error = error.message || 'Error fetching products';
+        console.error('Error fetching products:', error);
+      } finally {
+        this.loading = false;
+      }
     },
+
+  },
+  mounted() {
+    this.getProducts();
   },
   setup() {
     const isMobileNavOpen = ref(false);
@@ -38,13 +62,16 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('products', ['allProducts']),
-    ...mapGetters('products', ['loading']),
+    // ...mapState({
+    //   count: 'count'
+    // })
+    count () {
+      return this.$store.state.count
+    }
   },
-  created() {
-    this.getAllProducts();
-  }
 }
+
+// console.log(this.count);
 
 </script>
 
@@ -85,28 +112,40 @@ export default {
               </div>
           </div>
       </header>
-      
+    
       <main class="p-[26px] pb-0 sm:p-[38px] md:p-[46px] lg:p-[64px]">
           <div class="headArea flex items-center justify-between flex-wrap gap-1 sm:gap-3 pb-10 md:pb-[64px]">
               <h2 class="text-[32px] text-black">Trending events</h2>
-              <div class="flex items-center gap-3">
-                <button @click="toggleProductView" class="border bg-neutral-300 rounded-md flex items-center py-1 px-1 gap-2 text-[#432361] text-[16px] shadow-2xl">
-                    <span :class="`${productView === 'grid' ? 'bg-white shadow-2xl' : 'bg-transparent'} px-2 rounded-[3.8px]`">Grid</span>
-                    <span :class="`${productView === 'list' ? 'bg-white shadow-2xl' : 'bg-transparent'} px-2 rounded-[3.8px]`">List</span>
-                </button>
-                <button class="trendingBtn flex items-center gap-2 text-[#432361] text-[16px]">
-                    View all trending events
-                    <img src="/src/assets/images/Arrow--up-right.svg" alt="search icon" class="icon">
-                </button>
-              </div>
+              <button class="trendingBtn flex items-center gap-2 text-[#432361] text-[16px]">
+                  View all trending events
+                  <img src="/src/assets/images/Arrow--up-right.svg" alt="search icon" class="icon">
+              </button>
           </div>
-          
-          <div v-if="allProducts && allProducts !== 0" class="w-full">
-            <div v-if="productView === 'list'">
-              <ProductListView />
-            </div>
-            <div v-if="productView === 'grid'">
-              <ProductGridView />
+    
+          <div v-if="products2 && products2 !== 0" class="w-full">
+            <div class="cards w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-6" id="cards">
+                <!-- Product Cards -->
+              <div v-for="product in products2" :key="product.id" class="flex flex-col border rounded-[10px] shadow-md">
+                <div class="header flex items-center justify-center py-4">
+                    <img :src="product.image || '/src/assets/images/imagePlaceholder.jpeg'" :alt="product.title" class="h-[240px] object-contain rounded-t-[9px] transition-transform duration-300 ease-in-out transform hover:scale-105">
+                </div>
+                <div class="body flex flex-col gap-4 py-4 px-6">
+                    <div class="flex flex-col gap-0">
+                        <p class="text-[16px] truncate font-bold">{{product.title}}</p>
+                        <p class="text-[14px] font-semibold">
+                            <span>Sun, Oct 3rd</span>
+                            <span class="h-4 w-4 bg-black rounded-full"></span>
+                            <span>6pm</span>
+                        </p>
+                    </div>
+                    <p class="text-[14px]">{{product.description.slice(0,300)}}...</p>
+                    <RouterLink :to="`product-details/${product.id}`" class="trendingBtn font-semibold flex items-center gap-2 text-[#432361] text-[14px] pb-4 px-2">
+                        View details
+                        <img src="/src/assets/images/Arrow--up-right.svg" alt="arrow icon" class="icon">
+                    </RouterLink>
+                </div>
+              </div>
+      
             </div>
           </div>
           <div v-else class="w-full">
@@ -140,6 +179,33 @@ export default {
               </div>              
           </div>
       </main>
+    
+      <!-- <footer class="w-full flex flex-col md:flex-row gap-12 lg:gap-96 bg-[#432361] px-[24px] md:px-[64px] py-[56px] pb-20 text-white">
+          <div class="w-full md:w-1/3">
+              <h2 class="text-[32px] font-semibold">rendezvous</h2>
+              <p class="text-[16px]">Your Personal Event Sherpa: Curating Awesome, One Click at a Time.</p>
+          </div>
+          <div class="w-2/3 flex gap-12 lg:gap-28 flex-wrap lg:flex-nowrap">
+              <div class="flex flex-col gap-3 w-full md:w-auto">
+                  <h3 class="text-[20px]">Feature</h3>
+                  <a href="#" class="text-[16px] whitespace-nowrap">Events discovery</a>
+                  <a href="#" class="text-[16px] whitespace-nowrap">Ticketing</a>
+              </div>
+              <div class="flex flex-col gap-3 w-full md:w-auto">
+                  <h3 class="text-[20px]">Company</h3>
+                  <a href="#" class="text-[16px] whitespace-nowrap">About us</a>
+                  <a href="#" class="text-[16px] whitespace-nowrap">FAQs</a>
+                  <a href="#" class="text-[16px] whitespace-nowrap">Careers</a>
+                  <a href="#" class="text-[16px] whitespace-nowrap">Support</a>
+              </div>
+              <div class="flex flex-col items-start justify-normal gap-3 w-full md:w-auto">
+                  <h3 class="text-[20px]">Contact us</h3>
+                  <a href="#" class="text-[16px] whitespace-nowrap">info@events.com</a>
+                  <a href="#" class="text-[16px] whitespace-nowrap">+234 701 345 6789</a>
+                  <a href="#" class="text-[16px] w-full">Race Course, 8/9 Marina, Onikan, Lagos Lagos, 4aa Force Rd, Lagos Island 102273, Lagos</a>
+              </div>
+          </div>
+      </footer> -->
     
       <FooterView/>
     </div>

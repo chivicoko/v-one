@@ -1,17 +1,18 @@
-import './assets/main.css'
+import './assets/main.css';
+import { createApp } from 'vue';
 
-import { createApp } from 'vue'
+import App from './App.vue';
+import router from './router';
+import store from './store';
 
-import App from './App.vue'
-import router from './router'
-
-const app = createApp(App)
+const app = createApp(App);
 
 app.config.errorHandler = (err) => {
-    console.error('Global error handler:', err);
-    router.push('/error');
+  console.error('Global error handler:', err);
+  router.push('/error');
 };
 
-app.use(router)
+app.use(router);
+app.use(store); // Use the store
 
-app.mount('#app')
+app.mount('#app');

@@ -1,61 +1,18 @@
 
 <script>
-import { useRoute } from 'vue-router';
-
-import axios from 'axios';
 import FooterView from '@/components/FooterView.vue';
+import LoadingView from '@/components/LoadingView.vue';
 import NavbarView from '@/components/NavbarView.vue';
 import MobileNavView from '@/components/MobileNavView.vue';
-import LoadingView from '@/components/LoadingView.vue';
 import { ref } from 'vue';
 
+import {mapGetters, mapActions} from 'vuex';
+
 export default {
-    name: 'ProductDetailsView',
-  components: {
-    NavbarView,
-    MobileNavView,
-    LoadingView,
-    FooterView,
-  },
-  data: function() {
-  return {
-      product: {},
-      loading: false,
-      error: null,
-    };
-  },
+  name: 'HomeView',
+  components: { LoadingView, NavbarView, MobileNavView, FooterView, },
   methods: {
-    async getProduct() {
-      this.loading = true;
-      this.error = null;
-
-        const route = useRoute();
-        const productId = route.params.id;
-
-        // console.log(route);
-        // console.log(productId);
-
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/${productId}`);
-        // console.log(res.data);
-
-        // Check for successful response and valid data format
-        if (res.status === 200 && res.data) {
-          this.product = res.data;
-        //   console.log(this.product.rating.rate);
-        } else {
-          throw new Error('Unexpected response format');
-        }
-      } catch (error) {
-        this.error = error.message || 'Error fetching products';
-        console.error('Error fetching products:', error);
-      } finally {
-        this.loading = false;
-      }
-    },
-  },
-  mounted() {
-    this.getProduct();
+    ...mapActions('products', ['getProductById']),
   },
   setup() {
     const isMobileNavOpen = ref(false);
@@ -69,6 +26,13 @@ export default {
       isMobileNavOpen,
       toggleMobileNav
     };
+  },
+  computed: {
+    ...mapGetters('products', ['product']),
+    ...mapGetters('products', ['loading']),
+  },
+  created() {
+    this.getProductById();
   }
 }
 

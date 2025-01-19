@@ -17,13 +17,13 @@
         <button class="SignupBtn hidden sm:block bg-[#783EAD] py-[8px] lg:py-[12px] px-[16px] lg:px-[24px] font-semibold text-white rounded-[7px] lg:rounded-[10px]">Sign up</button>
       </div>
 
-      <!-- Hamburger menu for mobile -->
-      <button 
-          class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-700" 
-          aria-controls="navbar-default" aria-expanded="false" @click="toggleMobileNav">
-          <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <!-- Hamburger menu for mobile -->
+        <button 
+            class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-700" 
+            aria-controls="navbar-default" aria-expanded="false" @click="toggleMobileNav">
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-          </svg>
+            </svg>
         </button>
     </nav>
   </template>
@@ -34,9 +34,7 @@
   
   export default {
     name: 'NavbarView',
-    components: {
-      MobileNavView
-    },
+    components: { MobileNavView },
     setup() {
       const isMobileNavOpen = ref(false);
   
