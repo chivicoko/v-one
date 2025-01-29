@@ -1,5 +1,5 @@
 <template>
-    <nav class="flex items-center justify-between bg-white rounded-xl py-[0.6rem] px-[0.9rem] lg:rounded-2xl lg:py-[1rem] lg:px-[1.5rem] bg-opacity-80">
+    <nav class="border shadow-lg flex items-center justify-between bg-white rounded-xl py-[0.6rem] px-[0.9rem] lg:rounded-2xl lg:py-[1rem] lg:px-[1.5rem] bg-opacity-80">
       <div class="logo flex items-center gap-1 sm:gap-2">
         <RouterLink to="/" class="text-[20px] sm:text-[24px] md:text-[29px] lg:text-[32px] font-bold text-[#432361]">rendezvous</RouterLink>
       </div>
@@ -12,9 +12,19 @@
           <li><button class="py-[0.2rem] px-[0.3rem] lg:py-[0.5rem] lg:px-[1rem] border-b-2 text-[16px] font-semibold text-[#432361] border-transparent hover:border-[#783EAD] transition-transform duration-300">Contact us</button></li>
         </ul>
       </div>
-      <div class="btns flex items-center gap-2 lg:gap-4">
-        <button class="loginBtn hidden sm:block py-2 px-4 lg:px-5 text-[#783EAD] font-semibold border-transparent hover:border-[#783EAD] transition-transform duration-300">Log in</button>
-        <button class="SignupBtn hidden sm:block bg-[#783EAD] py-[8px] lg:py-[12px] px-[16px] lg:px-[24px] font-semibold text-white rounded-[7px] lg:rounded-[10px]">Sign up</button>
+
+      <div class="flex items-center gap-3">
+        <RouterLink to="/cart" class="relative p-2 hover:bg-neutral-200 rounded-full transition-all duration-200 ease-in-out">
+          <img src="/src/assets/images/shopping-cart-2.svg" alt="cart icon" class="size-8 object-contain">
+          <span v-if="cartItemCount" class="absolute top-0 right-0 bg-[#783EAD] text-white rounded-full size-5 flex items-center justify-center">
+            {{ cartItemCount }}
+          </span>
+        </RouterLink>
+        
+        <div class="btns flex items-center gap-2 lg:gap-4 border-l">
+          <button class="loginBtn hidden sm:block py-2 px-4 lg:px-5 text-[#783EAD] font-semibold border-transparent hover:border-[#783EAD] transition-transform duration-300">Log in</button>
+          <button class="SignupBtn hidden sm:block bg-[#783EAD] py-[8px] lg:py-[12px] px-[16px] lg:px-[24px] font-semibold text-white rounded-[7px] lg:rounded-[10px]">Sign up</button>
+        </div>
       </div>
 
         <!-- Hamburger menu for mobile -->
@@ -31,6 +41,7 @@
   <script>
   import { ref } from 'vue';
   import MobileNavView from './MobileNavView.vue';
+  import { mapGetters } from 'vuex';
   
   export default {
     name: 'NavbarView',
@@ -46,6 +57,9 @@
         isMobileNavOpen,
         toggleMobileNav
       };
+    },
+    computed: {
+      ...mapGetters('products', ['cartItemCount'])
     }
   };
   </script>

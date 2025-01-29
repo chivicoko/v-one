@@ -20,6 +20,7 @@ export default {
   },
   methods: {
     ...mapActions('products', ['getAllProducts']),
+    ...mapActions('products', ['loadCart']),
     toggleProductView() {
       this.productView = this.productView === 'grid'? 'list' : 'grid';
     },
@@ -38,11 +39,11 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('products', ['allProducts']),
-    ...mapGetters('products', ['loading']),
+    ...mapGetters('products', ['allProducts', 'loading']),
   },
   created() {
     this.getAllProducts();
+    this.loadCart();
   }
 }
 

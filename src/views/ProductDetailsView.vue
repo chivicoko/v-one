@@ -4,20 +4,27 @@ import FooterView from '@/components/FooterView.vue';
 import LoadingView from '@/components/LoadingView.vue';
 import NavbarView from '@/components/NavbarView.vue';
 import MobileNavView from '@/components/MobileNavView.vue';
+import AddToCartIcon from '@/components/icons/AddToCartIcon.vue';
 import { ref } from 'vue';
 
 import {mapGetters, mapActions} from 'vuex';
 
 export default {
   name: 'HomeView',
-  components: { LoadingView, NavbarView, MobileNavView, FooterView, },
+  components: { LoadingView, NavbarView, MobileNavView, FooterView, AddToCartIcon },
   methods: {
-    ...mapActions('products', ['getProductById']),
+    ...mapActions('products', ['getProductById', 'addToCart', 'increaseQuantity', 'decreaseQuantity']),
+    cartBtnToggle(productId) {
+        this.addToCart(productId);
+    },
+    cartItemQuantity(productId) {
+      const cartItem = this.cartItems.find((item) => item.id === productId);
+      return cartItem ? cartItem.quantity : 0;
+    },
   },
   setup() {
     const isMobileNavOpen = ref(false);
 
-    // Function to toggle the mobile navigation visibility
     const toggleMobileNav = () => {
       isMobileNavOpen.value = !isMobileNavOpen.value;
     };
@@ -28,8 +35,10 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('products', ['product']),
-    ...mapGetters('products', ['loading']),
+    ...mapGetters('products', ['product', 'loading', 'cartItems']),
+    isProductInCart() {
+      return (productId) => this.cartItems.some((item) => item.id === productId);
+    },
   },
   created() {
     this.getProductById();
@@ -47,12 +56,12 @@ export default {
     <div v-else>
         <MobileNavView :isOpen="isMobileNavOpen" @close="toggleMobileNav" />
           
-        <header class="w-full h-full py-[20px] px-[24px] md:py-[30px] md:px-[34px] lg:py-[50px] lg:px-[64px] flex flex-col gap-6">
-              <NavbarView />
-      
-              <div class="flex items-center justify-center gap-6 shadow-md border rounded-[10px]" id="productImage">
-                  <img :src="product.image || '/src/assets/images/imagePlaceholder.jpeg'" :alt="product.title" class="h-[300px] sm:h-[480px] rounded-[10px]">
-              </div>
+        <header class="w-full h-full py-[20px] px-[24px] md:py-[30px] md:px-[34px] lg:px-[64px] flex flex-col gap-6">
+            <NavbarView />
+    
+            <div class="flex items-center justify-center gap-6 shadow-md border rounded-[10px]" id="productImage">
+                <img :src="product.image || '/src/assets/images/imagePlaceholder.jpeg'" :alt="product.title" class="h-[300px] sm:h-[480px] rounded-[10px]">
+            </div>
           </header>
       
           <main class="p-[26px] pb-24 sm:p-[44px] md:p-[64px]">
@@ -78,6 +87,33 @@ export default {
                               <img src="/src/assets/images/User.svg" alt="search icon" class="w-[24px] h-[24px]">
                               <span>FK, Jollz</span>
                           </div>
+                          
+                          <div class="border-b mt-2 py-1">
+                            <button
+                                @click="cartBtnToggle(product.id)"
+                                :class="`${isProductInCart(product.id) ? 'hidden' : 'block'} size-12 p-2 hover:bg-neutral-200 rounded-full transition-all duration-200 ease-in-out`"
+                            >
+                                <AddToCartIcon />
+                            </button>
+    
+                            <div :class="`${isProductInCart(product.id) ? 'block' : 'hidden'} flex items-center gap-2 px-2 py-1`">
+                                <button
+                                    @click="decreaseQuantity(product.id)"
+                                    class="h-fit px-2 pb-1 flex items-center justify-center hover:bg-neutral-200 rounded-full transition-all duration-200 ease-in-out text-2xl"
+                                >
+                                -
+                                </button>
+                                <span class="p-2 flex items-center justify-center bg-[#432361] text-white rounded-full transition-all duration-200 ease-in-out text-base">
+                                    {{ cartItemQuantity(product.id) }}
+                                </span>
+                                <button
+                                    @click="increaseQuantity(product.id)"
+                                    class="px-2 pb-1 flex items-center justify-center hover:bg-neutral-200 rounded-full transition-all duration-200 ease-in-out text-2xl"
+                                >
+                                +
+                                </button>
+                            </div>
+                          </div>
                       </div>
       
                       <div class="text-[16px] flex flex-col gap-2 md:gap-4">
@@ -94,12 +130,12 @@ export default {
                               </p>
                               <p class="flex flex-col gap-1">
                                   <span class="text-[18px] md:text-[20px]">Category</span>
-                                  <span class="text-[16px] text-[#9B51E0]" id="productCategory">{{product.category}}</span>
+                                  <span class="text-[16px] text-[#9B51E0] capitalize" id="productCategory">{{product.category}}</span>
                               </p>
                               <p class="flex flex-col gap-1">
                                   <span class="text-[18px] md:text-[20px]">Rating</span>
-                                  <span class="text-[16px] text-[#9B51E0]" id="productRate">4.5(343)</span>
-                                  <!-- <span class="text-[16px] text-[#9B51E0]" id="productRate">{{product.rating}}({{product.rating}})</span> -->
+                                  <!-- <span class="text-[16px] text-[#9B51E0]" id="productRate">4.5(343)</span> -->
+                                  <span class="text-[16px] text-[#9B51E0]" id="productRate">{{product.rating.rate}}({{product.rating.count}})</span>
                               </p>
                           </div>
                       </div>
